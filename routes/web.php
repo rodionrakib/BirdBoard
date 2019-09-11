@@ -15,5 +15,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/projects','ProjectController@save');
+Route::post('/projects','ProjectController@save')->middleware('auth');
+Route::get('/projects/{project}','ProjectController@show')->middleware('auth');
 Route::get('/projects','ProjectController@index');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+

@@ -8,15 +8,7 @@
     <title>Document</title>
 </head>
 <body>
-    <h1> All Projects </h1>
-    <ol>
-        @foreach($projects as $project)
-            <li>
-                <dt> {{ $project->title  }} </dt>
-                <dd> {{$project->description}} </dd>
-            </li>
-
-        @endforeach
-    </ol>
+    <h1>{{$project->title}}</h1>
+    <p>{{$project->description}}</p>
 </body>
 </html>
