@@ -24,16 +24,57 @@ class ProjectController extends Controller
         return view('projects.show',compact('project'));
     }
 
+    public function create()
+    {
+        return view('projects.create');
+    }
+
+
     public function save(Request $request)
     {
-        // validate
-        $attribute = $request->validate(['title' => 'required', 'description' => 'required']);
+        
+        $validatedData = $this->validation($request);
+
+        $validatedData['owner_id'] = auth()->id();
+
 
         // persist
-        Project::create($attribute);
+        Project::create($validatedData);
 
         // redirect
         return redirect('/projects');
+    }
+
+    public function update(Request $request,Project $project)
+    {
+
+
+
+        $project->update($request->all());
+        
+
+        return redirect($project->path());
+
+    }
+
+    public function edit(Project $project)
+    {
+        return view('projects.edit',compact('project')); 
+    }
+    public function destroy(Project $project)
+    {
+        abort_if($project->owner_id !== auth()->id(),403);
+
+        $project->delete();
+    }
+
+    public function validation($request)
+    {
+        return $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'notes' => 'sometimes',
+        ]);
     }
 
 
