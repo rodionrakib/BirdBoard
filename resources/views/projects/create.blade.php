@@ -1,39 +1,19 @@
-@extends('layout')
+@extends ('layouts.app')
+
 @section('content')
- <section id="get-started" class="padd-section text-center wow fadeInUp">
+    <div class="lg:w-1/2 lg:mx-auto bg-white py-12 px-16 rounded shadow">
+        <h1 class="text-2xl font-normal mb-10 text-center">
+            Let’s start something new
+        </h1>
 
-    <div class="container">
-      <div class="section-title text-center">
-
-        <h2>simple systeme fordiscount </h2>
-        <p class="separator">Integer cursus bibendum augue ac cursus .</p>
-        <a href="{{route('project-create')}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Add Project</a>
-      </div>
+        <form 
+            method="POST" 
+            action="/projects"
+        >
+            @include ('projects.form', [
+                'project' => new App\Project,
+                'buttonText' => 'Create Project'
+            ])
+        </form>
     </div>
-
-	<div class="container">
-		@if ($errors->any())
-		    <div class="alert alert-danger">
-		        <ul>
-		            @foreach ($errors->all() as $error)
-		                <li>{{ $error }}</li>
-		            @endforeach
-		        </ul>
-		    </div>
-		@endif
-		<form method="POST" action={{ route('project-save') }}>
-			@csrf
-  		<div class="form-group">
-    		<label for="title">Project Title</label>
-    		<input type="text"  name="title" class="form-control" id="title" placeholder="Project Title">
-  		</div>
-
-  		<div class="form-group">
-    		<label for="description">Example textarea</label>
-    		<textarea class="form-control" name="description" id="description" rows="5"></textarea>
-  		</div>
-   			<button type="submit" class="btn btn-primary">Create</button>
-		</form>
-	</div>
-</section>
 @endsection

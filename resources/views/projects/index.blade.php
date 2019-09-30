@@ -1,35 +1,20 @@
-  @extends('layout')
+@extends('layouts.app')
+
 @section('content')
-  <section id="get-started" class="padd-section text-center wow fadeInUp">
-
-    <div class="container">
-      <div class="section-title text-center">
-
-        <h2>simple systeme fordiscount </h2>
-        <p class="separator">Integer cursus bibendum augue ac cursus .</p>
-        <a href="{{route('project-create')}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Add Project</a>
-      </div>
-    </div>
-
-    <div class="container">
-      <div class="row">
-       
-        @foreach($projects as $project)
-        <div class="col-md-6 col-lg-3">
-          <div class="feature-block">
-
-            <img src="/img/svg/cloud.svg" alt="img" class="img-fluid">
-            <h4>{{$project->title}}</h4>
-            <p>{{$project->description}}</p>      
-          
-            <a href="{{ $project->path() }}">read more</a>
-            <a href="{{ $project->path() }}/edit">Edit Project </a>
-
-          </div>
+    <header class="flex items-center mb-3 pb-4">
+        <div class="flex justify-between items-center w-full">
+            <h3 class="text-grey text-sm font-normal">My Projects</h3>
+            <a href="/projects/create" class="button">New Project</a>
         </div>
-        @endforeach
-      </div>
-    </div>
+    </header>
 
-  </section>
+    <main class="lg:flex lg:flex-wrap -mx-3">
+        @forelse ($projects as $project)
+            <div class="lg:w-1/3 px-3 pb-6">
+                @include ('projects.card')
+            </div>
+        @empty
+            <div>No Project yet.</div>
+        @endforelse
+    </main>
 @endsection

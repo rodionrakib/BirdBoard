@@ -11,7 +11,10 @@ class ProjectTaskController extends Controller
 	public function store(Project $project,Request $request)
 	{
 
-		abort_if( auth()->id() !== $project->owner_id,403) ; 
+
+
+
+        $this->authorize('update',$project);
 
 		$data = $request->validate([
 
@@ -31,7 +34,17 @@ class ProjectTaskController extends Controller
     {
 
 
-    	abort_if(auth()->id() !== $project->owner_id,403);
+
+
+
+        $this->authorize('update',$project);
+
+    	$attributes = $request->validate([
+            'title' => 'sometimes',
+            'completed' => 'sometimes'
+        ]);
+
+
     	
         $task->update([
         	'title' => $request->get('title'),

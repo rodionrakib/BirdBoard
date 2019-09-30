@@ -1,66 +1,105 @@
-@extends('layout')
+@extends ('layouts.app')
+
 @section('content')
-  <section id="get-started" class="padd-section text-center wow fadeInUp">
+    <header class="flex items-center mb-3 pb-4">
+        <div class="flex justify-between items-end w-full">
+            <p class="text-grey text-sm font-normal">
+                <a href="/projects" class="text-grey text-sm font-normal no-underline hover:underline">My Projects</a>
+                / {{ $project->title }}
+            </p>
 
-    <div class="container">
-      <div class="section-title text-center">
-        <h2>{{$project->title}}</h2>
-        <p class="separator">{{$project->description}}</p>
-      </div>
-    </div>
+            <a href="{{ $project->path() . '/edit' }}" class="button">Edit Project</a>
+        </div>
+    </header>
 
-    <div class="container">
-      <div class="row">
-      	<div class="col-lg-12">
-      		@if ($errors->any())
-			    <div class="alert alert-danger">
-			        <ul>
-			            @foreach ($errors->all() as $error)
-			                <li>{{ $error }}</li>
-			            @endforeach
-			        </ul>
-			    </div>
-			@endif
-      		<form method="POST" action="{{route('task-store',$project->id)}}" >
-      			@csrf
-      			 <div class="form-group">
-				    <label for="title">Task Body</label>
-				    <input type="text" class="form-control" name="title" id="title" placeholder="Task ">
-				  </div>	
-			  <button type="submit" class="btn btn-primary">Add Task</button>
-			</form>
-      		<h1>Bootstrap To-Do App</h1>
+    <main>
+        <div class="lg:flex -mx-3">
+            <div class="lg:w-3/4 px-3 mb-6">
+                <div class="mb-8">
+                    <h2 class="text-lg text-grey font-normal mb-3">Tasks</h2>
 
-			@foreach($project->tasks as $task)
-				<form method="POST" action="{{$project->path()}}/tasks/{{$task->id}}" >
-					@csrf
-					@method('PATCH')
-				<div class="form-group">
-					<input type="text" name="title" value="{{$task->title}}">
-					<input type="checkbox" name="completed" value="{{$task->completed}}"
-					{{ $task->completed ? 'checked': ''}}
-					 onchange="this.form.submit()">
-					
-					
+                    {{-- tasks --}}
+                    @foreach ($project->tasks as $task)
+                        <div class="card mb-3">
+                            <form method="POST" action="{{ $task->path() }}">
+                                @method('PATCH')
+                                @csrf
 
-				</div>
-				</form>
-			@endforeach
+                                <div class="flex">
+                                    <input name="title" value="{{ $task->title }}" class="w-full {{ $task->completed ? 'text-grey' : '' }}">
+                                    <input name="completed" type="checkbox" onChange="this.form.submit()" {{ $task->completed ? 'checked' : '' }}>
+                                </div>
+                            </form>
+                        </div>
+                    @endforeach
 
-			<form method="POST" action="{{$project->path()}}">
-				@csrf;
-				@method('PATCH')
-				<div class="form-group">
-				  <label for="notes">Notes:</label>
-				  <textarea class="form-control" rows="5"  name="notes" id="notes">{{ $project->notes }}</textarea>
-				</div>
-				<button type="submit">Save</button>
-			</form>
+                    <div class="card mb-3">
+                        <form action="{{ $project->path() . '/tasks' }}" method="POST">
+                            @csrf
 
-      	</div>			
-         	
-      </div>
-    </div>
+                            <input placeholder="Add a new task..." class="w-full" name="title">
+                        </form>
+                    </div>
+                </div>
 
-  </section>
+                <div>
+                    <h2 class="text-lg text-grey font-normal mb-3">General Notes</h2>
+
+                    {{-- general notes --}}
+                    <form method="POST" action="{{ $project->path() }}">
+                        @csrf
+                        @method('PATCH')
+
+                        <textarea
+                            name="notes"
+                            class="card w-full mb-4"
+                            style="min-height: 200px"
+                            placeholder="Anything special that you want to make a note of?"
+                        >{{ $project->notes }}</textarea>
+
+                        <button type="submit" class="button">Save</button>
+                    </form>
+
+                    @if ($errors->any())
+                        <div class="field mt-6">
+                            @foreach ($errors->all() as $error)
+                                <li class="text-sm text-red">{{ $error }}</li>
+                            @endforeach
+                        </div>
+                    @endif
+                    
+                </div>
+            </div>
+
+            <div class="lg:w-1/4 px-3 lg:py-8">
+                @include ('projects.card')
+                <div class="card" style="height: 200px">
+                <ul>
+                @foreach($activities as $activity)
+                   
+
+                    @if($activity->description === 'project_created')   
+                    <li> You Created  Project {{ $activity->activityable->title }} </li>
+
+                    @elseif($activity->description === 'project_updated')   
+                    <li> You Updated Project  {{ $activity->activityable->title }}</li>
+
+                     
+                    @elseif($activity->description === 'task_created')   
+                    <li> You Created  Task {{ $activity->activityable->title }} </li>
+
+                    @elseif($activity->description === 'task_completed')   
+                    <li> You Completed Task  {{ $activity->activityable->title }}</li>
+
+                    @elseif($activity->description === 'task_incompleted')   
+                    <li> You Incompleted Task  {{ $activity->activityable->title }}</li>
+
+                    @endif
+                   
+                 @endforeach
+                </ul>
+                </div>
+            </div>
+        </div>
+    </main>
 @endsection

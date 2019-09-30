@@ -10,8 +10,18 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
-    public function signIn()
+    public function signIn(User $user = null)
     {
-    	$this->actingAs(factory(User::class)->create());
+
+        if($user){
+            $this->actingAs($user);
+            return $user;
+        }
+        else{
+            $this->actingAs($user = factory(User::class)->create());
+            return $user;
+        }
+        //return $user ? $this->actingAs($user) : $this->actingAs(factory(User::class)->create());
+
     }
 }

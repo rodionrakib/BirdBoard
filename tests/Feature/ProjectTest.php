@@ -33,7 +33,6 @@ public function guest_cant_visit_projects()
 
 
 
-
 /** @test */
 
  public function owner_can_update_his_project()
@@ -175,6 +174,27 @@ public function guest_cant_visit_projects()
             'description' => 'lorem ipsum'
 
         ]);
+
+
+    }
+
+
+    /** @test */
+    public function owned_and_shared_project_can_be_seen_from_dashboard()
+    {
+        $this->withoutExceptionHandling();
+
+        $motu = $this->signIn();
+
+        $projectByMotu = factory(Project::class)->create(['owner_id' => auth()->id()]);
+
+        $patlu = factory(User::class)->create();
+
+        $projectByMotu->invite($patlu);
+
+        $this->signIn($patlu);
+
+        $this->get('/projects')->assertSee($projectByMotu->title);
 
 
     }

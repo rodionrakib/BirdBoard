@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Project;
 use Illuminate\Http\Request;
+use App\Activity;
 
 class ProjectController extends Controller
 {
@@ -14,14 +15,22 @@ class ProjectController extends Controller
     public function index()
     {
 
-        $projects = auth()->user()->projects;
+        $projects = auth()->user()->getAccessableProject();
         return view('projects.index',compact('projects'));
     }
 
     public function show(Project $project)
     {
-        abort_if(auth()->id() !== $project->owner->id,403);
-        return view('projects.show',compact('project'));
+        $this->authorize('update',$project);
+
+        $activities = $project->getActivities();
+
+       
+
+        //dd($activities);                            
+
+
+        return view('projects.show',['project' => $project , 'activities' => $activities]);
     }
 
     public function create()
@@ -49,7 +58,6 @@ class ProjectController extends Controller
     {
 
 
-
         $project->update($request->all());
         
 
@@ -63,9 +71,13 @@ class ProjectController extends Controller
     }
     public function destroy(Project $project)
     {
-        abort_if($project->owner_id !== auth()->id(),403);
+
+
+        $this->authorize('update',$project);
 
         $project->delete();
+
+        return redirect('/projects');
     }
 
     public function validation($request)

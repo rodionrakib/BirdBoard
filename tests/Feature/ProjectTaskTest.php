@@ -57,6 +57,23 @@ class ProjectTaskTest extends TestCase
 
     }
 
+    /** @test */
+    public function project_can_be_deleted_by_owner()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->signIn();
+
+
+        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
+
+
+
+        $this->actingAs($project->owner)->delete($project->path());
+
+
+        $this->assertDatabaseMissing('projects',['id' => $project->id]);
+    }
 
 
 /** @test */

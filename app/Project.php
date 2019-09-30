@@ -14,6 +14,11 @@ class Project extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function members()
+    {
+        return $this->belongsToMany(User::class,'project_member');
+    }
+
     public function tasks()
     {
     	return $this->hasMany(\App\Task::class);
@@ -29,4 +34,27 @@ class Project extends Model
     {
         return '/projects/'.$this->id;
     }
+
+     public function activities()
+    {
+        return $this->morphMany('App\Activity', 'activityable');
+    }
+
+    public function getActivities()
+    {
+         return  Activity::where('project_id',$this->id)
+                            ->orderBy('created_at','desc')
+                            ->take(10)
+                            ->get();
+    }
+
+    public function invite(User $user)
+    {
+
+        return $this->members()->attach($user);
+
+
+    }
+
+
 }
