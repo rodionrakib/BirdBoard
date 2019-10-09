@@ -26,7 +26,6 @@ class ProjectController extends Controller
         $activities = $project->getActivities();
 
        
-
         //dd($activities);                            
 
 
@@ -42,23 +41,23 @@ class ProjectController extends Controller
     public function save(Request $request)
     {
         
-        $validatedData = $this->validation($request);
+        $data = $this->validation($request);
 
-        $validatedData['owner_id'] = auth()->id();
+        $data['owner_id'] = auth()->id();
 
+        Project::create($data);
 
-        // persist
-        Project::create($validatedData);
-
-        // redirect
         return redirect('/projects');
     }
 
     public function update(Request $request,Project $project)
     {
 
+        $this->authorize('update',$project);
 
-        $project->update($request->all());
+        $data = $this->validation($request);
+
+        $project->update($data);
         
 
         return redirect($project->path());
@@ -73,7 +72,7 @@ class ProjectController extends Controller
     {
 
 
-        $this->authorize('update',$project);
+        $this->authorize('manage',$project);
 
         $project->delete();
 
@@ -83,8 +82,8 @@ class ProjectController extends Controller
     public function validation($request)
     {
         return $request->validate([
-            'title' => 'required|max:255',
-            'description' => 'required',
+            'title' => 'required|sometimes|max:255',
+            'description' => 'required|sometimes',
             'notes' => 'sometimes',
         ]);
     }

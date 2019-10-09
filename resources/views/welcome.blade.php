@@ -97,3 +97,62 @@
         </div>
     </body>
 </html>
+<script type="text/javascript">
+    
+function StopWatch(){
+
+  let running = false;
+  let startTime= 0;
+  let endTime = 0;
+  let duration = 0;
+
+  this.start = function(){
+    if(running){ throw new Error('Already running.') };
+    startTime = new Date();
+    running = true;
+    
+  }
+
+  this.stop = function(){
+     
+     if(!running){ throw new Error('Start in order to stop')};
+     endTime = new Date(); 
+     duration += (endTime.getTime() - startTime.getTime())/1000;
+     running = false;
+  }
+
+  this.reset = function(){
+    duration = 0;
+    running = false;
+    startTime = null;
+    endTime = null;
+  }
+
+
+
+
+  Object.defineProperty(this,'duration',{
+    get:function(){ return duration }
+  });
+
+
+
+}
+
+let person = { name: 'Sovon'};
+
+let baseObject = Object.getPrototypeOf(person);
+
+let toStringDescriptor = Object.getOwnPropertyDescriptor(baseObject,'valueOf');
+
+
+
+
+
+
+
+
+
+
+
+</script>

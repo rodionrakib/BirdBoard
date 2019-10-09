@@ -71,6 +71,9 @@
                                             @csrf
                                         </form>
                                     </div>
+                                    <div>
+                                        Logged In As {{ auth()->user()->name }}
+                                    </div>
                                 </li>
                             @endguest
                         </ul>

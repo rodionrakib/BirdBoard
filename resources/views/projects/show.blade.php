@@ -8,6 +8,22 @@
                 / {{ $project->title }}
             </p>
 
+
+        </div>
+        <div class="flex items-center">
+            @foreach($project->members as $member)
+                <img
+                        src="https://www.gravatar.com/avatar/{{md5($member->email)}}?s=60"
+                        alt="{{$member->name}}'s Profile"
+                        class="rounded-full">
+            @endforeach
+            <img
+                        src="https://www.gravatar.com/avatar/{{md5('sovon.kucse@gmail.com')}}?s=60"
+                        alt="Owners
+                         Profile"
+                        class="rounded-full">
+
+
             <a href="{{ $project->path() . '/edit' }}" class="button">Edit Project</a>
         </div>
     </header>
@@ -99,7 +115,29 @@
                  @endforeach
                 </ul>
                 </div>
+                @if(auth()->user()->can('manage',$project))
+                <form method="POST" action="{{$project->path()}}/invitation">
+
+                    @csrf
+                    <input  class="w-full border border-grey rounded" type="email" 
+                    name="email" placeholder="Email address " 
+                    >
+                    <button type="submit" class="button ">Invite</button>
+                </form>
+                @endif
+                @if($errors->invitation->any())
+                <div class="field mt-6">
+                    
+                
+                    @foreach($errors->invitation->all() as $error)
+                    <li class="text-sm text-red"> {{$error}} </li>
+                    @endforeach
+                </div>
+                @endif
             </div>
+             
         </div>
     </main>
+
+
 @endsection

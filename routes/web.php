@@ -28,7 +28,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
 
@@ -40,6 +40,7 @@ Route::get('/projects/{project}','ProjectController@show')->middleware('auth');
 Route::get('/projects/{project}/edit','ProjectController@edit')->middleware('auth');
 Route::patch('/projects/{project}','ProjectController@update');
 Route::delete('/projects/{project}','ProjectController@destroy');
+Route::post('/projects/{project}/invitation','InvitationController@store')->name('invitation');
 
 Route::get('/projects','ProjectController@index')->middleware('auth');
 Auth::routes();

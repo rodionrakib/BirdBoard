@@ -33,24 +33,6 @@ public function guest_cant_visit_projects()
 
 
 
-/** @test */
-
- public function owner_can_update_his_project()
- {
-    $this->withoutExceptionHandling();
-
-    $this->signIn();
-     
-    $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
-
-
-    $this->patch($project->path(),['description' => 'Honey Boney','title' => 'updated']);
-     
-    $this->assertDatabaseHas('projects',['description' => 'Honey Boney','title' => 'updated']);
-     
- }
-
-
  /** @test */
 
  public function one_user_cannot_delete_others_project()
@@ -71,84 +53,6 @@ public function guest_cant_visit_projects()
 
  }
 
-
-
- /** @test */
-
- public function owner_can_delete_his_project()
- {
-      $this->signIn();
-     
-      $project = factory(Project::class)->create(['owner_id'=>auth()->id()]);
-
-      $this->assertCount(1,Project::all()); 
-
-      $this->delete('/projects/'.$project->id);
-     
-      $this->assertCount(0,Project::all());     
-
- }
-
-
-
- /** @test */
-
- public function owner_can_create_a_project()
- {
-     $this->signIn();
-     
-     $data = factory(Project::class)->raw(['owner_id'=>auth()->id()]);
-
-     $this->post('/projects',$data);
-     
-     $this->assertDatabaseHas('projects',$data);
-     
-
- }
-
-
-
-
- /** @test */
-
- public function a_project_notes_is_optional()
- {
-        $this->signIn();
-
-        $attr = factory(Project::class)->raw(['notes' => '']);
-
-        $response = $this->post('/projects',$attr);
-
-        $response->assertSessionHasNoErrors('notes');
-
- }
-
- /** @test */
-
- public function a_project_require_a_title()
- {
-        $this->signIn();
-
-        $attr = factory(Project::class)->raw(['title' => '']);
-
-        $response = $this->post('/projects',$attr);
-
-        $response->assertSessionHasErrors('title');
-
- }
-
-    /** @test */
-    public function a_project_require_a_description()
-    {
-        $this->signIn();
-
-        $attr = factory(Project::class)->raw(['description' => '']);
-
-        $response = $this->post('/projects',$attr);
-
-        $response->assertSessionHasErrors('description');
-
-    }
 
 
     /** @test */
@@ -196,6 +100,141 @@ public function guest_cant_visit_projects()
 
         $this->get('/projects')->assertSee($projectByMotu->title);
 
+
+    }
+
+
+    /** @test */
+
+    public function user_but_not_owner_cant_update_others_project()
+    {
+        //$this->withoutExceptionHandling();
+
+        $this->signIn();
+
+        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
+
+        $user = factory(User::class)->create();
+
+        $response = $this->actingAs($user)->patch($project->path(),['description' => 'Honey Boney','title' => 'updated']);
+
+        $response->assertStatus(403);
+    }
+
+    /** @test */
+
+
+
+
+    public function user_but_not_owner_cant_delete_others_project()
+    {
+        $owner = $this->signIn();
+
+        $project = factory(Project::class)->create(['owner_id'=>auth()->id()]);
+
+        $user = factory(User::class)->create();
+
+        $this->assertCount(1,Project::all());
+
+        $this->actingAs($user)->delete($project->path());
+
+        $this->assertCount(1,Project::all());
+
+        $project->invite($user);
+
+        $this->actingAs($user)->delete($project->path())
+                ->assertStatus(403);
+
+    }
+
+
+
+
+    public function owner_can_delete_his_project()
+    {
+        $owner = $this->signIn();
+
+        $project = factory(Project::class)->create(['owner_id'=>auth()->id()]);
+
+        $this->assertCount(1,Project::all());
+
+        $this->actingAs($owner)->delete('/projects/'.$project->id);
+
+        $this->assertCount(0,Project::all());
+
+    }
+
+    /** @test */
+
+    public function owner_can_update_his_project()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->signIn();
+
+        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
+
+        $this->patch($project->path(),['title' => 'updated','description' => 'As Usual']);
+
+        $this->assertDatabaseHas('projects',['title' => 'updated']);
+
+    }
+
+
+/** @test */
+    public function user_can_create_projects()
+    {
+        $this->signIn();
+
+
+        $this->post('/projects',[
+            'title' => 'new project',
+            'description' => 'cool project'
+        ]);
+
+        $this->assertDatabaseHas('projects',['title'=> 'new project','description'=> 'cool project']);
+
+
+    }
+
+    /** @test */
+
+    public function a_project_notes_is_optional()
+    {
+        $this->signIn();
+
+        $attr = factory(Project::class)->raw(['notes' => '']);
+
+        $response = $this->post('/projects',$attr);
+
+        $response->assertSessionHasNoErrors('notes');
+
+    }
+
+    /** @test */
+
+    public function a_project_require_a_title()
+    {
+        $this->signIn();
+
+        $attr = factory(Project::class)->raw(['title' => '']);
+
+        $response = $this->post('/projects',$attr);
+
+        $response->assertSessionHasErrors('title');
+
+    }
+
+    /** @test */
+    public function a_project_require_a_description()
+    {
+        $this->signIn();
+
+        $attr = factory(Project::class)->raw(['description' => '']);
+
+        $response = $this->post('/projects',$attr);
+
+        $response->assertSessionHasErrors('description');
 
     }
 
